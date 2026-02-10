@@ -1,0 +1,197 @@
+package com.teknikos.WestgateMobileApp.utils;
+
+
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.google.common.collect.ImmutableMap;
+
+
+import io.appium.java_client.android.AndroidDriver;
+
+
+public class ElementUtils {
+
+    protected AndroidDriver driver;
+    protected WebDriverWait wait;
+
+    public ElementUtils(AndroidDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    }
+
+    //Reads all cell data from Excel file
+    public List<String> readDataFromExcel(String filePath, int sheetIndex) throws IOException {
+        List<String> data = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(new File(filePath));
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(sheetIndex);
+            if (sheet == null) {
+                System.out.println("Sheet is empty or doesn't exist.");
+                return data;
+            }
+
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    switch (cell.getCellType()) {
+                        case STRING:
+                            String stringValue = cell.getStringCellValue().trim();
+                            data.add(stringValue.isEmpty() ? "Missing data in cell." : stringValue);
+                            break;
+                        case NUMERIC:
+                            data.add(String.valueOf(cell.getNumericCellValue()));
+                            break;
+                        case BOOLEAN:
+                            data.add(String.valueOf(cell.getBooleanCellValue()));
+                            break;
+                        case FORMULA:
+                            data.add(cell.getCellFormula());
+                            break;
+                        default:
+                            data.add("Unsupported cell type.");
+                            break;
+                    }
+                }
+            }
+        }
+        return data;
+    }
+
+    // ✅ Long press gesture using mobile command
+    public void longPressGesture(WebElement ele) {
+        ((JavascriptExecutor) driver).executeScript("mobile: longClickGesture",
+                ImmutableMap.of("elementId", ((RemoteWebElement) ele).getId(), "duration", 2000));
+    }
+
+    // ✅ Swipe gesture (left, right, up, down)
+    public void swipeAction(WebElement ele, String direction) {
+        ((JavascriptExecutor) driver).executeScript("mobile: swipeGesture", ImmutableMap.of(
+                "elementId", ((RemoteWebElement) ele).getId(),
+                "direction", direction,
+                "percent", 0.75));
+    }
+
+    public void swipeUp() {
+        Dimension size = driver.manage().window().getSize();
+
+        int startX = size.width / 2;
+        int startY = (int) (size.height * 0.8);
+        int endY   = (int) (size.height * 0.2);
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence swipe = new Sequence(finger, 1);
+
+        swipe.addAction(finger.createPointerMove(
+                Duration.ZERO,
+                PointerInput.Origin.viewport(),
+                startX,
+                startY
+        ));
+        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        swipe.addAction(finger.createPointerMove(
+                Duration.ofMillis(700),
+                PointerInput.Origin.viewport(),
+                startX,
+                endY
+        ));
+        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        driver.perform(Arrays.asList(swipe));
+    }
+    // Scroll to a specific visible text
+    public void scrollUntilElementVisible(WebElement element, int maxScrolls) {
+        for (int i = 0; i < maxScrolls; i++) {
+            if (isElementPresent(element, 2)) {
+                return;
+            }
+            swipeUp();
+        }
+        throw new RuntimeException("Element not found after scrolling");
+    }
+
+
+
+    //Wait for element and check presence
+    public boolean isElementPresent(WebElement element, long timeoutInSeconds) {
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+                    .until(ExpectedConditions.elementToBeClickable(element));
+            return element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    //Wait for element to be clickable
+    public boolean isElementClickable(WebElement element, long timeoutInSeconds) {
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+                    .until(ExpectedConditions.elementToBeClickable(element));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Static method to wait for an element to be clickable
+    public static void waitForElementClickable(AndroidDriver driver, WebElement element, long timeoutInSeconds) {
+        new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+                .until(ExpectedConditions.elementToBeClickable(element));
+    }
+
+    //Press Enter key after delay (optional use)
+    public static void pressEnterWithDelay(AndroidDriver driver, long delayInMillis) {
+        try {
+            Thread.sleep(delayInMillis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // better practice
+        }
+        new Actions(driver).sendKeys(Keys.ENTER).perform();
+    }
+
+    //Verifies list of UI components with timeout
+    public static void verifyComponents(WebElement[] components, int timeoutInSeconds) {
+        for (WebElement component : components) {
+            assertTrue(isElementPresent(component, timeoutInSeconds),
+                    "'" + component.getText() + "' is not present on screen.");
+            System.out.println(component.getText() + " is present on screen.");
+        }
+    }
+
+    //Private static presence check (used only by verifyComponents)
+    private static boolean isElementPresent(WebElement element, int timeoutInSeconds) {
+        try {
+            return element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Optional visibility & enablement checker
+    protected static boolean isElementVisibleAndEnabled(WebElement element) {
+        try {
+            return element.isDisplayed() && element.isEnabled();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+}

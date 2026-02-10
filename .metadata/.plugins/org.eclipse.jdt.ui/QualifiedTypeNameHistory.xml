@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="com.teknikos.WestgateMobileApp.utils.ExtentReportManager"/>
+    <fullyQualifiedTypeName name="com.teknikos.WestgateMobileApp.config.ConfigReader"/>
+    <fullyQualifiedTypeName name="com.teknikos.WestgateMobileApp.core.DriverManager"/>
+    <fullyQualifiedTypeName name="com.teknikos.WestgateMobileApp.utils.ElementUtils"/>
+    <fullyQualifiedTypeName name="com.teknikos.WestgateMobileApp.base.BaseTest"/>
+    <fullyQualifiedTypeName name="io.appium.java_client.TouchAction"/>
+    <fullyQualifiedTypeName name="io.appium.java_client.touch.offset.PointOption"/>
+    <fullyQualifiedTypeName name="io.appium.java_client.touch.WaitOptions"/>
+    <fullyQualifiedTypeName name="org.openqa.selenium.interactions.PointerInput"/>
+    <fullyQualifiedTypeName name="org.openqa.selenium.interactions.Sequence"/>
+    <fullyQualifiedTypeName name="java.util.Arrays"/>
+</qualifiedTypeNameHistroy>

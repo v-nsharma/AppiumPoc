@@ -1,0 +1,88 @@
+package com.teknikos.WestgateMobileApp.base.pages;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
+
+import com.teknikos.WestgateMobileApp.utils.ElementUtils;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.AppiumFieldDecorator;
+
+import static org.testng.Assert.assertTrue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class LaunchPage extends ElementUtils {
+
+    private static final Logger logger = LogManager.getLogger(LaunchPage.class);
+
+    public LaunchPage(AndroidDriver driver) {
+        super(driver);
+        PageFactory.initElements(new AppiumFieldDecorator(driver), this);
+    }
+
+    // ---------------- LOCATORS ----------------
+
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='Continue as a Guest']")
+    private WebElement txtContinueAsGuest;
+
+    @AndroidFindBy(xpath = "//android.widget.Button[@text='Login or Sign Up']")
+    private WebElement btnLoginOrSignUp;
+
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='Vacation More. Get More.']")
+    private WebElement txtVacationMore;
+
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='Home']")
+    private WebElement txtHome;
+
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='My Account']")
+    private WebElement txtMyAccount;
+
+    // ---------------- ACTION / VALIDATION METHODS ----------------
+
+    /**
+     * Validate application launch screen
+     */
+    public void verifyAppLaunchedSuccessfully() {
+        logger.info("Verifying application launch screen");
+        assertTrue(
+                isElementPresent(txtContinueAsGuest, 10),
+                "App launch screen not displayed"
+        );
+    }
+
+    /**
+     * Tap Continue as Guest from launch screen
+     */
+    public void tapContinueAsGuest() {
+        logger.info("Tapping Continue as Guest");
+        assertTrue(isElementPresent(txtContinueAsGuest, 10));
+        txtContinueAsGuest.click();
+    }
+
+    /**
+     * Validate Home tab visibility (post launch)
+     */
+    public boolean isHomeTabVisible() {
+        try {
+            return txtHome.isDisplayed();
+        } catch (Exception e) {
+            logger.warn("Home tab not visible");
+            return false;
+        }
+    }
+
+    /**
+     * Validate My Account tab visibility
+     */
+    public boolean isMyAccountTabVisible() {
+        try {
+            return txtMyAccount.isDisplayed();
+        } catch (Exception e) {
+            logger.warn("My Account tab not visible");
+            return false;
+        }
+    }
+}

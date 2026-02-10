@@ -1,0 +1,98 @@
+package com.teknikos.WestgateMobileApp.utils;
+
+import java.io.File;
+import java.nio.file.Paths;
+
+import com.aventstack.extentreports.*;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+public class ExtentReportManager {
+
+    private static ExtentReports extent;
+    private static final ThreadLocal<ExtentTest> test = new ThreadLocal<>();
+
+    private static String reportDir;
+    private static String htmlReportPath;
+
+    // -------------------- INIT REPORT --------------------
+    public static synchronized void setupReport(String suiteName) {
+
+        try {
+            reportDir = Paths.get(System.getProperty("user.dir"), "reports").toString();
+            htmlReportPath = Paths.get(reportDir, "ExtentReport.html").toString();
+
+            File dir = new File(reportDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // ✅ BACKUP OLD REPORT
+            ReportBackupUtil.backupOldReport(htmlReportPath);
+
+            // ✅ RESET FOR NEW SUITE
+            extent = null;
+
+            ExtentSparkReporter spark = new ExtentSparkReporter(htmlReportPath);
+            spark.config().setDocumentTitle("Westgate Mobile Automation Report");
+            spark.config().setReportName("Suite : " + suiteName);
+            spark.config().setTheme(Theme.STANDARD);
+
+            extent = new ExtentReports();
+            extent.attachReporter(spark);
+
+            extent.setSystemInfo("Project", "Westgate Mobile App");
+            extent.setSystemInfo("Suite", suiteName);
+            extent.setSystemInfo("Tester", "QA Engineer");
+            extent.setSystemInfo("OS", System.getProperty("os.name"));
+            extent.setSystemInfo("Java", System.getProperty("java.version"));
+
+        } catch (Exception e) {
+            throw new RuntimeException("Extent Report setup failed", e);
+        }
+    }
+
+    // -------------------- TEST START --------------------
+    public static void startTest(String testName, String description) {
+        ExtentTest extentTest = extent.createTest(testName, description);
+        test.set(extentTest);
+    }
+
+    // -------------------- LOGGING --------------------
+    public static void logInfo(String msg) {
+        test.get().info(msg);
+    }
+
+    public static void logPass(String msg) {
+        test.get().pass(msg);
+    }
+
+    public static void logFail(String msg) {
+        test.get().fail(msg);
+    }
+
+    public static void logFail(String msg, Throwable t) {
+        test.get().fail(msg).fail(t);
+    }
+
+    // -------------------- SCREENSHOT --------------------
+    public static void logScreenshot(String message, String path) {
+        try {
+            test.get().info(message,
+                    MediaEntityBuilder.createScreenCaptureFromPath(path).build());
+        } catch (Exception e) {
+            test.get().warning("Screenshot attach failed: " + e.getMessage());
+        }
+    }
+
+    // -------------------- FLUSH --------------------
+    public static synchronized void tearDownReport() {
+        if (extent != null) {
+            extent.flush();
+        }
+    }
+
+    public static void clearTest() {
+        test.remove();
+    }
+}

@@ -1,0 +1,6 @@
+startAppiumServer=true
+appiumServerUrl=http://127.0.0.1:4723
+platformName=Android
+platformVersion=14
+deviceName=MobileID
+appPath=C:\Users\ChinnamaniG\Documents\Westgate Mobile App\WestgateMobileApp\src\test\resources\WGR.apk

@@ -1,0 +1,10 @@
+
+<suite name="Westgate Regression Suite" parallel="false">
+
+    <test name="Westgate Regression Tests">
+        <classes>
+            <class name="com.teknikos.WestgateMobileApp.WestgateRegressionTest"/>
+        </classes>
+    </test>
+
+</suite>

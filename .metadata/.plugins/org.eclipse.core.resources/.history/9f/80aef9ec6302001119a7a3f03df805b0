@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Westgate Mobile Suite">
+
+    <listeners>
+        <listener class-name="com.teknikos.WestgateMobileApp.utils.ExtentTestNGListener"/>
+    </listeners>
+
+    <test name="App Tests">
+        <classes>
+            <class name="com.teknikos.WestgateMobileApp.AppTest"/>
+        </classes>
+    </test>
+
+</suite>

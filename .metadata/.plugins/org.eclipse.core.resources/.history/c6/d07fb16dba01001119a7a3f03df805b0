@@ -1,0 +1,5 @@
+package com.teknikos.WestgateMobileApp.utils;
+
+public class ExtentReportManager {
+
+}

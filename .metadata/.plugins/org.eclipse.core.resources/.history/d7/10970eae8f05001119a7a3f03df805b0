@@ -1,0 +1,78 @@
+package com.teknikos.WestgateMobileApp;
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.teknikos.WestgateMobileApp.base.BaseTest;
+import com.teknikos.WestgateMobileApp.base.pages.LaunchPage;
+import com.teknikos.WestgateMobileApp.base.pages.LoginPage;
+import com.teknikos.WestgateMobileApp.core.DriverManager;
+import com.teknikos.WestgateMobileApp.utils.ExtentReportManager;
+
+import static org.testng.Assert.assertTrue;
+
+public class WestgateRegressionTest extends BaseTest {
+
+    private LaunchPage launchPage;
+    private LoginPage loginPage;
+
+    // ----------------------------------------------------
+    // SETUP
+    // ----------------------------------------------------
+    @BeforeClass
+    public void setUp() {
+        ExtentReportManager.setupReport();
+
+        launchPage = new LaunchPage(DriverManager.getDriver());
+        loginPage  = new LoginPage(DriverManager.getDriver());
+    }
+
+    // ----------------------------------------------------
+    // 1️⃣ APP LAUNCH TEST
+    // ----------------------------------------------------
+    @Test(priority = 1)
+    public void verifyAppLaunch() {
+
+        ExtentReportManager.startTest(
+                "Verify App Launch",
+                "Verify application launches successfully"
+        );
+
+        launchPage.verifyAppLaunchedSuccessfully();
+
+        assertTrue(
+                launchPage.isContinueAsGuestVisible(),
+                "Launch screen not displayed properly"
+        );
+    }
+
+    // ----------------------------------------------------
+    // 2️⃣ LOGIN TEST
+    // ----------------------------------------------------
+    @Test(priority = 2)
+    public void verifyLoginFunctionality() {
+
+        ExtentReportManager.startTest(
+                "Verify Login Functionality",
+                "Verify user can login with valid credentials"
+        );
+
+        launchPage.tapContinueAsGuest();
+
+        loginPage.loginAsRegisteredUser(
+                "KDORTCH55@GMAIL.COM",
+                "password"
+        );
+
+       
+    }
+
+    // ----------------------------------------------------
+    // TEARDOWN
+    // ----------------------------------------------------
+    @AfterClass
+    public void tearDown() {
+        ExtentReportManager.tearDownReport();
+    }
+}

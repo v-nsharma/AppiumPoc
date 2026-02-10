@@ -1,0 +1,41 @@
+package com.teknikos.WestgateMobileApp;
+
+import org.testng.annotations.Test;
+
+import com.teknikos.WestgateMobileApp.base.BaseTest;
+import com.teknikos.WestgateMobileApp.core.DriverManager;
+import com.teknikos.WestgateMobileApp.base.pages.LoginPage;
+import com.teknikos.WestgateMobileApp.utils.ExtentReportManager;
+
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+public class AppLaunchTest extends BaseTest {
+
+    @Test
+    public void verifyAppLaunch() {
+
+        ExtentReportManager.startTest(
+                "Verify App Launch",
+                "Validate application is launched successfully"
+        );
+
+        // Validate driver
+        assertNotNull(
+                DriverManager.getDriver(),
+                "Driver is NULL, app not launched"
+        );
+
+        // UI-level validation (best practice)
+        LoginPage loginPage = new LoginPage(DriverManager.getDriver());
+
+        assertTrue(
+                loginPage.isElementPresent(
+                        DriverManager.getDriver()
+                                .findElementByXPath("//android.widget.TextView[@text='Continue as a Guest']"),
+                        10
+                ),
+                "App launch screen not displayed"
+        );
+    }
+}

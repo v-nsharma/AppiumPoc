@@ -1,0 +1,103 @@
+package com.teknikos.WestgateMobileApp.utils;
+ 
+import org.testng.ITestContext;
+
+import org.testng.ITestListener;
+
+import org.testng.ITestResult;
+ 
+public class ExtentTestNGListener implements ITestListener {
+ 
+    @Override
+
+    public void onStart(ITestContext context) {
+
+        ExtentReportManager.setupReport();
+
+    }
+ 
+    @Override
+
+    public void onFinish(ITestContext context) {
+
+        ExtentReportManager.flushReport();  
+
+    }
+ 
+    @Override
+
+    public void onTestStart(ITestResult result) {
+
+        String testName = result.getMethod().getMethodName();
+
+        String description = result.getMethod().getDescription();
+ 
+        ExtentReportManager.startTest(testName, description);
+
+        ExtentReportManager.logInfo("Test Started: " + testName);
+
+    }
+ 
+    @Override
+
+    public void onTestSuccess(ITestResult result) {
+
+        ExtentReportManager.logPass("Test Passed");
+
+        ExtentReportManager.clearTest();
+
+    }
+ 
+    @Override
+
+    public void onTestFailure(ITestResult result) {
+
+        try {
+
+            String testName = result.getMethod().getMethodName();
+ 
+            ExtentReportManager.logFail(
+
+                    "Test Failed: " + testName,
+
+                    result.getThrowable()
+
+            );
+ 
+            String screenshotPath =
+
+                    ScreenshotUtils.captureScreenshot(testName);
+ 
+            ExtentReportManager.logScreenshot(
+
+                    "Failure Screenshot",
+
+                    screenshotPath
+
+            );
+ 
+        } catch (Exception e) {
+
+            ExtentReportManager.logFail("Screenshot capture failed", e);
+
+        } finally {
+
+            ExtentReportManager.clearTest();
+
+        }
+
+    }
+ 
+    @Override
+
+    public void onTestSkipped(ITestResult result) {
+
+        ExtentReportManager.logInfo("Test Skipped");
+
+        ExtentReportManager.clearTest();
+
+    }
+
+}
+
+ 
