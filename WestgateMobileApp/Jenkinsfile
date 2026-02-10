@@ -8,9 +8,10 @@ pipeline {
             }
         }
 
-        stage('Sanity') {
+        stage('Verify') {
             steps {
-                echo 'Jenkinsfile parsed successfully'
+                sh 'java -version'
+                sh 'mvn -version || true'
             }
         }
     }
