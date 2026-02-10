@@ -3,6 +3,7 @@ pipeline {
 
     options {
         timestamps()
+        skipDefaultCheckout(false)
     }
 
     stages {
@@ -12,17 +13,9 @@ pipeline {
             }
         }
 
-        stage('Verify Environment') {
+        stage('Sanity') {
             steps {
-                sh 'java -version || true'
-                sh 'node -v || true'
-                sh 'npm -v || true'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                echo 'Pipeline syntax validated successfully.'
+                echo 'Jenkinsfile parsed successfully'
             }
         }
     }
