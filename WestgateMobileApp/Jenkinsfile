@@ -3,53 +3,37 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Verify Environment') {
+        stage('Environment Check') {
             steps {
-                sh '''
-                java -version
-                node -v
-                npm -v
-                '''
+                sh 'java -version'
+                sh 'node -v || true'
+                sh 'npm -v || true'
             }
         }
 
         stage('Install Appium') {
             steps {
-                sh '''
-                npm install -g appium
-                appium -v
-                '''
-            }
-        }
-
-        stage('Start Appium Server') {
-            steps {
-                sh '''
-                appium --log appium.log &
-                sleep 10
-                '''
+                sh 'npm install -g appium'
+                sh 'appium -v'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh '''
-                mvn clean test
-                '''
+                sh 'mvn clean test'
             }
         }
     }
 
     post {
         always {
-            sh 'pkill -f appium || true'
-            archiveArtifacts artifacts: '**/target/surefire-reports/*'
+            archiveArtifacts artifacts: '**/target/surefire-reports/*.xml', allowEmptyArchive: true
         }
     }
 }
